@@ -1,0 +1,6 @@
+[linuxtech]
+name=LinuxTECH
+baseurl=http://pkgrepo.linuxtech.net/el6/release/
+enabled=1
+gpgcheck=1
+gpgkey=http://pkgrepo.linuxtech.net/el6/release/RPM-GPG-KEY-LinuxTECH.NET
