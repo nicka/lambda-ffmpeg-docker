@@ -156,3 +156,10 @@ RUN chmod +x copy-binaries.sh
 RUN mkdir -p /ffmpeg/binaries
 RUN ./copy-binaries.sh $(which ffmpeg) /ffmpeg/binaries
 RUN ./copy-binaries.sh $(which ffprobe) /ffmpeg/binaries
+
+# Test objects
+WORKDIR /
+COPY test-object.sh .
+RUN chmod +x test-object.sh
+
+ENTRYPOINT ["./test-object.sh"]

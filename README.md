@@ -18,6 +18,14 @@ docker cp $id:/usr/bin/ffprobe ../REPLACEME/
 docker rm -v $id
 ```
 
+### Test object within Lambda like environment
+
+Be sure to create a `.env.aws` file.
+
+```
+docker run --env-file .env.aws  nickdenengelsman/lambda-ffmpeg (samples|tracks|revisions) 07cdf0c8-bed0-4531-bafb-703b74410ac5 (aac|wav|m4a|ogg|mp3)
+```
+
 ### TODO's
 
 - [ ] Make `libx265` compiling work
