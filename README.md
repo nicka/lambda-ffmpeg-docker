@@ -11,19 +11,12 @@ You'll need Docker installed
 ### Copy over compiled binaries to your Lambda package
 
 ```bash
-id=$(docker create nicka/lambda-ffmpeg)
-docker cp $id:/ffmpeg/binaries ../REPLACEME
-docker cp $id:/usr/bin/ffmpeg ../REPLACEME/
-docker cp $id:/usr/bin/ffprobe ../REPLACEME/
-docker rm -v $id
-```
-
-### Test object within Lambda like environment
-
-Be sure to create a `.env.aws` file.
-
-```
-docker run --env-file .env.aws  nickdenengelsman/lambda-ffmpeg (samples|tracks|revisions) 07cdf0c8-bed0-4531-bafb-703b74410ac5 (aac|wav|m4a|ogg|mp3)
+env DOCKER_ID=$(docker create nickdenengelsman/lambda-ffmpeg)
+docker cp $DOCKER_ID:/ffmpeg/binaries ../REPLACEME
+docker cp $DOCKER_ID:/usr/bin/ffmpeg ../REPLACEME/
+docker cp $DOCKER_ID:/usr/bin/ffprobe ../REPLACEME/
+docker cp $DOCKER_ID:/node_modules/lwip ../REPLACEME/
+docker rm -v $DOCKER_ID
 ```
 
 ### TODO's

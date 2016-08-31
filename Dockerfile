@@ -1,4 +1,4 @@
-FROM lambci/lambda:build
+FROM lambci/lambda:build-nodejs6.10
 
 # Configure yum dependencies
 RUN rm -rf /etc/yum.repos.d/amzn*
@@ -43,7 +43,7 @@ RUN cmake -G "Unix Makefiles" \
 -DENABLE_SHARED:bool=off ../../source \
 && make && make install
 
-# fdk-aac - A standalone library of the Fraunhofer FDK AAC code from Android.
+# fdk-aac - a standalone library of the Fraunhofer FDK AAC code from Android.
 WORKDIR ~/ffmpeg_sources
 RUN git clone --depth 1 git://git.code.sf.net/p/opencore-amr/fdk-aac
 WORKDIR fdk-aac
@@ -88,7 +88,7 @@ RUN ./configure \
 --disable-shared \
 && make && make install && make distclean
 
-# libvorbis - reference implementation provides both a standard encoder and
+# libvorbis - a reference implementation provides both a standard encoder and
 # decoder under a BSD license.
 WORKDIR ~/ffmpeg_sources
 RUN curl -L -O http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.4.tar.gz
@@ -113,6 +113,17 @@ RUN PATH="$HOME/bin:$PATH" \
 --disable-examples \
 && PATH="$HOME/bin:$PATH" make && make install && make clean
 
+# AMR - an audio compression format optimized for speech coding.
+# application/ogg respectively.
+WORKDIR ~/ffmpeg_sources
+RUN curl -L -O http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz
+RUN tar xzvf opencore-amr-0.1.3.tar.gz
+WORKDIR opencore-amr-0.1.3
+RUN ./configure \
+--prefix="$HOME/ffmpeg_build" \
+--enable-shared \
+&& make && make install && make distclean
+
 # Libav(Avconv) - a fork of FFMpeg
 WORKDIR ~/ffmpeg_sources
 RUN git clone -b release/3.1 git://git.ffmpeg.org/ffmpeg
@@ -134,6 +145,9 @@ PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" \
 --enable-libvorbis \
 --enable-libvpx \
 --enable-libx264 \
+--enable-libopencore-amrnb \
+--enable-libopencore-amrwb \
+--enable-version3 \
 # --enable-libx265 \
 && PATH="$HOME/bin:$PATH" make && make install && make distclean
 
@@ -141,25 +155,30 @@ PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" \
 RUN cp $HOME/bin/ffmpeg /usr/bin/
 RUN cp $HOME/bin/ffprobe /usr/bin/
 
-# Test ffmpeg and ffprobe
-COPY example.wav .
-RUN ffprobe example.wav -v quiet -show_format -show_streams -of json
-RUN ffmpeg -y -i example.wav -vn -codec:a libmp3lame -b:a 128k example.mp3
-RUN ffmpeg -y -i example.wav -vn -strict -2 -codec:a libfdk_aac -b:a 96k example.m4a
-RUN ffmpeg -y -i example.wav -vn -codec:a libvorbis example.ogg
-RUN ffmpeg -y -i example.wav -filter_complex aformat=channel_layouts=mono,showwavespic=s=1200x400 -frames:v 1 example.png
-RUN rm example.*
+# Back to root
+WORKDIR /
 
-# Copy over binaries
+# Copy over associated binaries
 COPY copy-binaries.sh .
 RUN chmod +x copy-binaries.sh
 RUN mkdir -p /ffmpeg/binaries
 RUN ./copy-binaries.sh $(which ffmpeg) /ffmpeg/binaries
 RUN ./copy-binaries.sh $(which ffprobe) /ffmpeg/binaries
 
-# Test objects
-WORKDIR /
-COPY test-object.sh .
-RUN chmod +x test-object.sh
+# Test ffmpeg and ffprobe
+# COPY example.* ./
+# RUN ffprobe example.wav -v quiet -show_format -show_streams -of json
+# RUN ffmpeg -y -i example.wav -vn -codec:a libmp3lame -b:a 128k example_128.mp3
+# RUN ffmpeg -y -i example.wav -vn -strict -2 -codec:a libfdk_aac -b:a 96k example_96.m4a
+# RUN ffmpeg -y -i example.wav -vn -codec:a libvorbis example.ogg
+# RUN ffmpeg -y -i example.wav -filter_complex aformat=channel_layouts=mono,showwavespic=s=1200x400 -frames:v 1 example.png
+# RUN ffprobe example.mp4 -v quiet -show_format -show_streams -of json
+# RUN ffmpeg -y -i example.mp4 -vf "scale=-2:640, crop=640:640" -c:v libx264 -codec:a libfdk_aac -b:v 1200k example_640x640.mp4 \
+# && ffmpeg -y -ss 00:00:00.0 -i example_640x640.mp4 -f image2 -vframes 1 example.jpg \
+# && rm example.mp4 \
+# && mv example_640x640.mp4 example.mp4
+# RUN rm example.*
 
-ENTRYPOINT ["./test-object.sh"]
+# Install lwip
+# RUN npm install lwip@0.0.9
+# RUN ls -la ./node_modules/lwip
