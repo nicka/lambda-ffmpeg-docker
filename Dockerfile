@@ -115,7 +115,7 @@ RUN PATH="$HOME/bin:$PATH" \
 
 # Libav(Avconv) - a fork of FFMpeg
 WORKDIR ~/ffmpeg_sources
-RUN git clone git://git.ffmpeg.org/ffmpeg
+RUN git clone -b release/3.1 git://git.ffmpeg.org/ffmpeg
 WORKDIR ffmpeg
 RUN PATH="$HOME/bin:$PATH" \
 PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" \
