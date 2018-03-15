@@ -1,6 +1,6 @@
 # Docker Lambda with FFmpeg
 
-Image that (very closely) mimics the live AWS Lambda environment with FFmpeg support.
+Image that (very closely) mimics the live AWS Lambda environment with FFmpeg 3.4 support.
 
 Based on the wonderful: https://hub.docker.com/r/lambci/lambda/
 
@@ -15,7 +15,6 @@ env DOCKER_ID=$(docker create nickdenengelsman/lambda-ffmpeg)
 docker cp $DOCKER_ID:/ffmpeg/binaries ../REPLACEME
 docker cp $DOCKER_ID:/usr/bin/ffmpeg ../REPLACEME/
 docker cp $DOCKER_ID:/usr/bin/ffprobe ../REPLACEME/
-docker cp $DOCKER_ID:/node_modules/lwip ../REPLACEME/
 docker rm -v $DOCKER_ID
 ```
 

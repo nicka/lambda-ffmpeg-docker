@@ -126,8 +126,9 @@ RUN ./configure \
 
 # Libav(Avconv) - a fork of FFMpeg
 WORKDIR ~/ffmpeg_sources
-RUN git clone -b release/3.1 git://git.ffmpeg.org/ffmpeg
+RUN git clone -b release/3.4 git://git.ffmpeg.org/ffmpeg
 WORKDIR ffmpeg
+RUN yum -y install openssl-devel
 RUN PATH="$HOME/bin:$PATH" \
 PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" \
 ./configure \
@@ -138,6 +139,7 @@ PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" \
 --pkg-config-flags="--static" \
 --enable-gpl \
 --enable-nonfree \
+--enable-openssl \
 --enable-libfreetype \
 --enable-libmp3lame \
 --enable-libopus \
@@ -164,7 +166,6 @@ RUN chmod +x copy-binaries.sh
 RUN mkdir -p /ffmpeg/binaries
 RUN ./copy-binaries.sh $(which ffmpeg) /ffmpeg/binaries
 RUN ./copy-binaries.sh $(which ffprobe) /ffmpeg/binaries
-
 # Test ffmpeg and ffprobe
 # COPY example.* ./
 # RUN ffprobe example.wav -v quiet -show_format -show_streams -of json
@@ -179,6 +180,3 @@ RUN ./copy-binaries.sh $(which ffprobe) /ffmpeg/binaries
 # && mv example_640x640.mp4 example.mp4
 # RUN rm example.*
 
-# Install lwip
-# RUN npm install lwip@0.0.9
-# RUN ls -la ./node_modules/lwip
